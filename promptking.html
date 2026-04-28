@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PromptKing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000000;
+  --bg2:#0A0A0A;
+  --bg3:#111111;
+  --border:#1F1F1F;
+  --border2:#2A2A2A;
+  --white:#FFFFFF;
+  --gray:#888888;
+  --gray2:#444444;
+  --accent:#FF4500;
+  --font-display:'Bebas Neue',sans-serif;
+  --font-body:'Space Grotesk',sans-serif;
+  --font-mono:'DM Mono',monospace;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--white);font-family:var(--font-body);overflow-x:hidden}
+
+/* HEADER */
+header{border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:100}
+.header-logo{font-family:var(--font-display);font-size:28px;letter-spacing:0.08em;color:var(--white)}
+.header-nav{display:flex;gap:32px;align-items:center}
+.header-nav a{font-size:13px;color:var(--gray);text-decoration:none;letter-spacing:0.05em;transition:color .2s}
+.header-nav a:hover{color:var(--white)}
+.header-btn{background:var(--white);color:var(--bg);font-family:var(--font-body);font-size:13px;font-weight:600;padding:10px 20px;border:none;cursor:pointer;letter-spacing:0.05em;transition:opacity .2s}
+.header-btn:hover{opacity:.85}
+
+/* HERO */
+.hero{padding:80px 40px 60px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.hero-tag{font-family:var(--font-mono);font-size:11px;color:var(--gray);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.hero-tag::before{content:'';width:20px;height:1px;background:var(--gray2)}
+.hero-title{font-family:var(--font-display);font-size:clamp(80px,14vw,180px);line-height:0.9;letter-spacing:0.02em;color:var(--white);margin-bottom:32px}
+.hero-title span{color:var(--accent)}
+.hero-sub{font-size:16px;color:var(--gray);max-width:480px;line-height:1.7;margin-bottom:40px;font-weight:300}
+.hero-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn-primary{background:var(--white);color:var(--bg);font-family:var(--font-body);font-size:14px;font-weight:600;padding:14px 32px;border:none;cursor:pointer;letter-spacing:0.04em;transition:all .2s}
+.btn-primary:hover{background:#e0e0e0}
+.btn-secondary{background:transparent;color:var(--gray);font-family:var(--font-body);font-size:14px;font-weight:500;padding:14px 32px;border:1px solid var(--border2);cursor:pointer;letter-spacing:0.04em;transition:all .2s}
+.btn-secondary:hover{border-color:var(--gray);color:var(--white)}
+.hero-counter{font-family:var(--font-mono);font-size:11px;color:var(--gray2);letter-spacing:0.1em;margin-top:48px}
+
+/* MAIN APP */
+main{max-width:860px;margin:0 auto;padding:60px 40px}
+
+/* STEPS */
+.steps-bar{display:flex;align-items:center;gap:6px;margin-bottom:48px}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:all .4s}
+.step-dot.active{background:var(--white);box-shadow:0 0 8px rgba(255,255,255,.4)}
+.step-dot.done{background:var(--gray2)}
+.step-line{flex:1;height:1px;background:var(--border)}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);padding:40px;margin-bottom:16px;position:relative}
+.card-tag{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:24px}
+.card-title{font-family:var(--font-display);font-size:clamp(28px,4vw,42px);color:var(--white);margin-bottom:12px;line-height:1.1;letter-spacing:0.02em}
+.card-title em{color:var(--accent);font-style:normal}
+.card-text{font-size:15px;color:var(--gray);line-height:1.7;margin-bottom:32px;font-weight:300}
+
+/* INPUTS */
+textarea,input[type=text]{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--white);font-family:var(--font-body);font-size:15px;padding:16px 20px;outline:none;resize:none;transition:border-color .3s;line-height:1.6}
+textarea:focus,input[type=text]:focus{border-color:var(--gray)}
+textarea::placeholder,input[type=text]::placeholder{color:var(--gray2)}
+
+/* QUESTION */
+.q-num{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.2em;margin-bottom:12px}
+.q-text{font-family:var(--font-display);font-size:clamp(24px,3.5vw,36px);color:var(--white);margin-bottom:8px;line-height:1.1;letter-spacing:0.02em}
+.q-hint{font-size:13px;color:var(--gray2);font-style:italic;margin-bottom:24px;font-weight:300}
+
+/* PROGRESS */
+.progress-bar{height:1px;background:var(--border);margin-bottom:40px}
+.progress-fill{height:100%;background:var(--white);transition:width .6s ease}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;font-family:var(--font-body);font-size:13px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:none;font-weight:600;transition:all .2s}
+.btn-white{background:var(--white);color:var(--bg)}
+.btn-white:hover{background:#e0e0e0}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--gray)}
+.btn-ghost:hover{border-color:var(--gray);color:var(--white)}
+
+/* PROMPT OUTPUT */
+.prompt-wrap{position:relative;margin-bottom:24px}
+.prompt-label{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px}
+.prompt-output{background:var(--bg3);border:1px solid var(--border2);padding:28px;font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--white);white-space:pre-wrap;word-break:break-word}
+.copy-btn{position:absolute;top:36px;right:12px;background:var(--border2);border:none;color:var(--gray);cursor:pointer;padding:6px 14px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;transition:all .2s}
+.copy-btn:hover{background:var(--white);color:var(--bg)}
+
+/* LOADING */
+.loading{display:flex;align-items:center;gap:16px;padding:32px 0;justify-content:center}
+.loading-text{font-family:var(--font-mono);font-size:13px;color:var(--gray);letter-spacing:0.1em}
+.loading-dots span{animation:blink 1.2s infinite;opacity:0}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,100%{opacity:0}50%{opacity:1}}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--border);margin:32px 0}
+
+/* HIDDEN / FADE */
+.hidden{display:none!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .4s ease both}
+
+/* SUCCESS */
+.success-crown{font-family:var(--font-display);font-size:48px;color:var(--accent);display:block;margin-bottom:8px;letter-spacing:0.05em}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-logo{font-family:var(--font-display);font-size:20px;letter-spacing:0.08em;color:var(--gray2)}
+.footer-text{font-family:var(--font-mono);font-size:11px;color:var(--gray2);letter-spacing:0.1em}
+
+@media(max-width:640px){
+  header{padding:16px 20px}
+  .header-nav{display:none}
+  .hero{padding:48px 20px 40px}
+  main{padding:40px 20px}
+  .card{padding:28px 20px}
+  footer{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-logo">PROMPTKING</div>
+  <nav class="header-nav">
+    <a href="#app">Generate</a>
+    <a href="#how">How it works</a>
+  </nav>
+  <button class="header-btn" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">Try Free →</button>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">AI Prompt Engineering</div>
+  <div class="hero-title">PROMPT<br><span>KING</span></div>
+  <p class="hero-sub">Answer a few smart questions. Get the most powerful AI prompt possible. No guessing. No wasted tokens.</p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">Generate Your Prompt →</button>
+    <button class="btn-secondary">See Examples</button>
+  </div>
+  <div class="hero-counter">👑 &nbsp;TRUSTED BY 3,000+ AI USERS &nbsp;·&nbsp; 10,000+ PROMPTS GENERATED</div>
+</section>
+
+<!-- APP -->
+<div id="app">
+<main>
+  <div class="steps-bar" id="stepsBar"></div>
+
+  <!-- SCREEN 1 -->
+  <div id="screen1" class="fade-in">
+    <div class="card">
+      <div class="card-tag">// Start here</div>
+      <div class="card-title">What do you want<br><em>AI to do for you?</em></div>
+      <p class="card-text">Describe your goal in plain language. I'll ask the right questions and forge a prompt that gets results — every time.</p>
+      <textarea id="goalInput" rows="4" placeholder="e.g. I want to write product descriptions for my Shopify dropshipping store that convert visitors into buyers..."></textarea>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:4px">
+      <button class="btn btn-white" onclick="startSession()">Generate Prompt →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2 -->
+  <div id="screen2" class="hidden">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="card fade-in" id="questionCard">
+      <div class="q-num">QUESTION <span id="qNum">1</span> / <span id="qTotal">6</span> &nbsp;·&nbsp; <span id="qCategory"></span></div>
+      <div class="q-text" id="qText"></div>
+      <div class="q-hint" id="qHint"></div>
+      <input type="text" id="answerInput" placeholder="Your answer..." onkeydown="if(event.key==='Enter')nextQuestion()">
+    </div>
+    <div style="display:flex;gap:12px;margin-top:4px">
+      <button class="btn btn-white" onclick="nextQuestion()">Next →</button>
+      <button class="btn btn-ghost" onclick="skipQuestion()">Skip</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3 -->
+  <div id="screen3" class="hidden">
+    <div class="card fade-in" style="text-align:center;padding:60px 40px">
+      <div class="loading">
+        <div class="loading-text">FORGING YOUR PROMPT<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></div>
+      </div>
+      <p style="color:var(--gray2);font-size:13px;font-family:var(--font-mono);letter-spacing:0.05em">Analyzing answers · Crafting the perfect prompt · Almost ready</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 4 -->
+  <div id="screen4" class="hidden fade-in">
+    <div class="card">
+      <div class="card-tag">// Your royal prompt is ready</div>
+      <div class="success-crown">PROMPT<br>READY.</div>
+      <hr class="divider">
+      <div class="prompt-wrap">
+        <div class="prompt-label">Generated Prompt — Copy & paste into any AI</div>
+        <div class="prompt-output" id="promptOutput"></div>
+        <button class="copy-btn" onclick="copyPrompt()">COPY</button>
+      </div>
+      <hr class="divider">
+      <p style="color:var(--gray2);font-size:13px;font-family:var(--font-mono);margin-bottom:24px;letter-spacing:0.05em">Paste this into ChatGPT, Claude, Gemini, or any AI tool.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-white" onclick="restart()">New Prompt →</button>
+        <button class="btn btn-ghost" onclick="refinePrompt()">Refine It</button>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">PROMPTKING</div>
+  <div class="footer-text">© 2025 PROMPTKING &nbsp;·&nbsp; MASTER OF AI PROMPTS</div>
+</footer>
+
+<script>
+const QS={marketing:[{cat:"AUDIENCE",text:"Who is your ideal customer?",hint:"e.g. women aged 25-40 who love fitness"},{cat:"BENEFITS",text:"What are the 3 biggest benefits of your product?",hint:"Think about what problems it solves"},{cat:"TONE",text:"What tone should the AI use?",hint:"e.g. professional, friendly, luxury, urgent"},{cat:"PLATFORM",text:"Where will this content appear?",hint:"e.g. Shopify product page, Facebook ad, email"},{cat:"CTA",text:"What action should the reader take?",hint:"e.g. buy now, sign up, click the link"},{cat:"USP",text:"What makes you different from competitors?",hint:"Your unique selling point"}],writing:[{cat:"FORMAT",text:"What format do you need?",hint:"e.g. blog post, email, bullet points, script"},{cat:"LENGTH",text:"How long should the output be?",hint:"e.g. 200 words, 5 paragraphs, short and punchy"},{cat:"TONE",text:"What tone and style?",hint:"e.g. formal, conversational, humorous"},{cat:"AUDIENCE",text:"Who will be reading this?",hint:"e.g. beginners, experts, business owners"},{cat:"INSPIRATION",text:"Any style or brand to inspire from?",hint:"e.g. write like Apple marketing"},{cat:"CONSTRAINTS",text:"Anything to include or avoid?",hint:"e.g. always mention brand, no jargon"}],business:[{cat:"SITUATION",text:"What is the business challenge?",hint:"Describe the problem in detail"},{cat:"GOAL",text:"What outcome do you want?",hint:"Be specific about the desired result"},{cat:"LIMITS",text:"What are your constraints?",hint:"e.g. small team, limited budget"},{cat:"STAKEHOLDERS",text:"Who are the key people involved?",hint:"e.g. investors, customers, team"},{cat:"FORMAT",text:"How should the response be structured?",hint:"e.g. action plan, SWOT, step-by-step"},{cat:"LEVEL",text:"What expertise level should AI assume?",hint:"e.g. beginner, experienced marketer"}],general:[{cat:"CONTEXT",text:"Give more background on what you're working on.",hint:"The more detail, the better"},{cat:"FORMAT",text:"How should the AI respond?",hint:"e.g. bullet points, paragraphs, table"},{cat:"TONE",text:"What tone should it use?",hint:"e.g. casual, formal, expert"},{cat:"LENGTH",text:"How detailed do you want the answer?",hint:"e.g. brief overview, in-depth"},{cat:"EXAMPLES",text:"Should AI include examples or case studies?",hint:"e.g. yes with real examples"},{cat:"CONSTRAINTS",text:"Any requirements or things to avoid?",hint:"e.g. no jargon, practical only"}]};
+let goal='',questions=[],answers=[],qIdx=0,total=0;
+function detect(g){g=g.toLowerCase();if(/product|shop|sell|ad|market|customer|descri/.test(g))return'marketing';if(/write|blog|email|article|post|content|story/.test(g))return'writing';if(/business|strategy|plan|startup|company|team/.test(g))return'business';return'general'}
+function buildBar(n){const b=document.getElementById('stepsBar');b.innerHTML='';for(let i=0;i<n;i++){if(i>0)b.innerHTML+='<div class="step-line"></div>';b.innerHTML+=`<div class="step-dot" id="d${i}"></div>`}}
+function updateBar(c){for(let i=0;i<total;i++){const d=document.getElementById(`d${i}`);if(!d)return;d.className='step-dot';if(i<c)d.classList.add('done');else if(i===c)d.classList.add('active')}}
+function show(id){['screen1','screen2','screen3','screen4'].forEach(s=>{const el=document.getElementById(s);el.classList.add('hidden')});const el=document.getElementById(id);el.classList.remove('hidden');el.classList.remove('fade-in');void el.offsetWidth;el.classList.add('fade-in')}
+function startSession(){const g=document.getElementById('goalInput').value.trim();if(!g){document.getElementById('goalInput').style.borderColor='#ff4444';return}goal=g;answers=[];qIdx=0;questions=QS[detect(g)];total=questions.length;buildBar(total);document.getElementById('qTotal').textContent=total;show('screen2');renderQ()}
+function renderQ(){const q=questions[qIdx];document.getElementById('qNum').textContent=qIdx+1;document.getElementById('qCategory').textContent=q.cat;document.getElementById('qText').textContent=q.text;document.getElementById('qHint').textContent=q.hint?'→ '+q.hint:'';document.getElementById('answerInput').value='';document.getElementById('answerInput').focus();document.getElementById('progressFill').style.width=(qIdx/total*100)+'%';updateBar(qIdx);const c=document.getElementById('questionCard');c.classList.remove('fade-in');void c.offsetWidth;c.classList.add('fade-in')}
+function nextQuestion(){const a=document.getElementById('answerInput').value.trim();answers.push({q:questions[qIdx].text,a:a||'(not specified)'});qIdx++;if(qIdx>=total)generatePrompt();else renderQ()}
+function skipQuestion(){answers.push({q:questions[qIdx].text,a:'(skipped)'});qIdx++;if(qIdx>=total)generatePrompt();else renderQ()}
+async function generatePrompt(){show('screen3');document.getElementById('progressFill').style.width='100%';const at=answers.filter(a=>a.a!=='(skipped)').map(a=>`- ${a.q}: ${a.a}`).join('\n');try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`You are PromptKing, a master prompt engineer. Create the most powerful, detailed AI prompt based on the user's goal and answers. Include role, context, task, format, tone, and constraints. Return ONLY the prompt itself, no explanations, 150-350 words.`,messages:[{role:'user',content:`Goal: ${goal}\n\nAnswers:\n${at}\n\nGenerate the perfect prompt.`}]})});const d=await r.json();document.getElementById('promptOutput').textContent=d.content?.[0]?.text||fallback();show('screen4')}catch(e){document.getElementById('promptOutput').textContent=fallback();show('screen4')}}
+function fallback(){return`You are an expert assistant. Your task is to help with the following goal: ${goal}\n\nContext and requirements:\n${answers.map(a=>`• ${a.q} → ${a.a}`).join('\n')}\n\nProvide a comprehensive, well-structured, and actionable response. Be specific and practical. Tailor everything to the details provided above. Avoid generic advice.`}
+function copyPrompt(){navigator.clipboard.writeText(document.getElementById('promptOutput').textContent).then(()=>{const b=document.querySelector('.copy-btn');b.textContent='COPIED ✓';b.style.background='var(--white)';b.style.color='var(--bg)';setTimeout(()=>{b.textContent='COPY';b.style.background='';b.style.color=''},2000)})}
+function refinePrompt(){qIdx=0;answers=[];show('screen2');renderQ()}
+function restart(){document.getElementById('goalInput').value='';goal='';answers=[];qIdx=0;document.getElementById('stepsBar').innerHTML='';show('screen1')}
+</script>
+</body>
+</html>

@@ -3,239 +3,615 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PromptKing</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>PromptKing — Master of AI Prompts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#000000;
-  --bg2:#0A0A0A;
-  --bg3:#111111;
-  --border:#1F1F1F;
-  --border2:#2A2A2A;
-  --white:#FFFFFF;
-  --gray:#888888;
-  --gray2:#444444;
-  --accent:#FF4500;
+  --bg:#000;--bg2:#0A0A0A;--bg3:#111;--bg4:#161616;
+  --border:#1F1F1F;--border2:#2A2A2A;
+  --white:#FFF;--gray:#888;--gray2:#444;--gray3:#333;
+  --accent:#FF4500;--accent2:#FF6B35;
+  --success:#22C55E;--danger:#EF4444;
   --font-display:'Bebas Neue',sans-serif;
   --font-body:'Space Grotesk',sans-serif;
   --font-mono:'DM Mono',monospace;
 }
-html,body{min-height:100%;background:var(--bg);color:var(--white);font-family:var(--font-body);overflow-x:hidden}
+html,body{height:100%;background:var(--bg);color:var(--white);font-family:var(--font-body);overflow-x:hidden}
+
+/* LAYOUT */
+.app-layout{display:flex;min-height:100vh;flex-direction:column}
+.app-body{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:280px;min-width:280px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 60px);position:sticky;top:60px;overflow:hidden}
+.sidebar-header{padding:20px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-title{font-family:var(--font-mono);font-size:10px;letter-spacing:0.2em;color:var(--gray);text-transform:uppercase}
+.sidebar-clear{font-family:var(--font-mono);font-size:10px;color:var(--gray2);cursor:pointer;letter-spacing:0.1em;background:none;border:none;transition:color .2s}
+.sidebar-clear:hover{color:var(--accent)}
+.sidebar-list{flex:1;overflow-y:auto;padding:12px}
+.sidebar-list::-webkit-scrollbar{width:4px}
+.sidebar-list::-webkit-scrollbar-track{background:transparent}
+.sidebar-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.history-empty{text-align:center;padding:40px 16px;color:var(--gray2);font-size:13px;font-family:var(--font-mono);letter-spacing:0.05em;line-height:1.6}
+.history-item{background:var(--bg3);border:1px solid var(--border);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
+.history-item:hover{border-color:var(--border2);background:var(--bg4)}
+.history-goal{font-size:12px;color:var(--white);line-height:1.5;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.history-meta{display:flex;align-items:center;justify-content:space-between}
+.history-time{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.05em}
+.history-rating{display:flex;gap:4px}
+.rating-dot{width:6px;height:6px;border-radius:50%}
+.rating-dot.good{background:var(--success)}
+.rating-dot.bad{background:var(--danger)}
+.rating-dot.none{background:var(--gray2)}
+.history-delete{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--gray2);cursor:pointer;font-size:14px;opacity:0;transition:opacity .2s}
+.history-item:hover .history-delete{opacity:1}
+.history-delete:hover{color:var(--accent)}
 
 /* HEADER */
-header{border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:100}
-.header-logo{font-family:var(--font-display);font-size:28px;letter-spacing:0.08em;color:var(--white)}
-.header-nav{display:flex;gap:32px;align-items:center}
-.header-nav a{font-size:13px;color:var(--gray);text-decoration:none;letter-spacing:0.05em;transition:color .2s}
+header{height:60px;border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:100}
+.header-logo{font-family:var(--font-display);font-size:26px;letter-spacing:0.08em;color:var(--white)}
+.header-logo span{color:var(--accent)}
+.header-nav{display:flex;gap:28px;align-items:center}
+.header-nav a{font-size:13px;color:var(--gray);text-decoration:none;letter-spacing:0.04em;transition:color .2s;cursor:pointer}
 .header-nav a:hover{color:var(--white)}
-.header-btn{background:var(--white);color:var(--bg);font-family:var(--font-body);font-size:13px;font-weight:600;padding:10px 20px;border:none;cursor:pointer;letter-spacing:0.05em;transition:opacity .2s}
+.header-btn{background:var(--white);color:var(--bg);font-family:var(--font-body);font-size:12px;font-weight:700;padding:9px 20px;border:none;cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;transition:opacity .2s}
 .header-btn:hover{opacity:.85}
 
+/* MAIN CONTENT */
+.main-content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+
 /* HERO */
-.hero{padding:80px 40px 60px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
-.hero-tag{font-family:var(--font-mono);font-size:11px;color:var(--gray);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
-.hero-tag::before{content:'';width:20px;height:1px;background:var(--gray2)}
-.hero-title{font-family:var(--font-display);font-size:clamp(80px,14vw,180px);line-height:0.9;letter-spacing:0.02em;color:var(--white);margin-bottom:32px}
+.hero{padding:72px 48px 56px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.hero::after{content:'PROMPTKING';position:absolute;right:-20px;top:50%;transform:translateY(-50%);font-family:var(--font-display);font-size:200px;color:rgba(255,255,255,0.02);pointer-events:none;line-height:1;white-space:nowrap}
+.hero-tag{font-family:var(--font-mono);font-size:10px;color:var(--gray);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.hero-tag::before{content:'';width:16px;height:1px;background:var(--gray2)}
+.hero-title{font-family:var(--font-display);font-size:clamp(72px,10vw,140px);line-height:0.9;letter-spacing:0.02em;margin-bottom:28px}
 .hero-title span{color:var(--accent)}
-.hero-sub{font-size:16px;color:var(--gray);max-width:480px;line-height:1.7;margin-bottom:40px;font-weight:300}
-.hero-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.btn-primary{background:var(--white);color:var(--bg);font-family:var(--font-body);font-size:14px;font-weight:600;padding:14px 32px;border:none;cursor:pointer;letter-spacing:0.04em;transition:all .2s}
+.hero-sub{font-size:15px;color:var(--gray);max-width:440px;line-height:1.75;margin-bottom:36px;font-weight:300}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:40px}
+.btn-primary{background:var(--white);color:var(--bg);font-family:var(--font-body);font-size:13px;font-weight:700;padding:13px 28px;border:none;cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;transition:all .2s}
 .btn-primary:hover{background:#e0e0e0}
-.btn-secondary{background:transparent;color:var(--gray);font-family:var(--font-body);font-size:14px;font-weight:500;padding:14px 32px;border:1px solid var(--border2);cursor:pointer;letter-spacing:0.04em;transition:all .2s}
+.btn-secondary{background:transparent;color:var(--gray);font-family:var(--font-body);font-size:13px;font-weight:500;padding:13px 28px;border:1px solid var(--border2);cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;transition:all .2s}
 .btn-secondary:hover{border-color:var(--gray);color:var(--white)}
-.hero-counter{font-family:var(--font-mono);font-size:11px;color:var(--gray2);letter-spacing:0.1em;margin-top:48px}
+.hero-stats{display:flex;gap:32px;flex-wrap:wrap}
+.hero-stat{text-align:left}
+.hero-stat strong{display:block;font-family:var(--font-display);font-size:32px;color:var(--white);letter-spacing:0.04em}
+.hero-stat span{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.1em;text-transform:uppercase}
 
-/* MAIN APP */
-main{max-width:860px;margin:0 auto;padding:60px 40px}
+/* HOW IT WORKS */
+.how-section{padding:56px 48px;border-bottom:1px solid var(--border)}
+.section-tag{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:20px}
+.section-title{font-family:var(--font-display);font-size:clamp(32px,4vw,52px);letter-spacing:0.02em;margin-bottom:36px;line-height:1}
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--border)}
+.how-step{background:var(--bg);padding:28px 24px}
+.how-num{font-family:var(--font-display);font-size:48px;color:var(--accent);opacity:.3;line-height:1;margin-bottom:12px}
+.how-title{font-size:14px;font-weight:600;margin-bottom:8px;letter-spacing:0.02em}
+.how-desc{font-size:13px;color:var(--gray);line-height:1.6;font-weight:300}
 
-/* STEPS */
-.steps-bar{display:flex;align-items:center;gap:6px;margin-bottom:48px}
-.step-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:all .4s}
-.step-dot.active{background:var(--white);box-shadow:0 0 8px rgba(255,255,255,.4)}
+/* APP SECTION */
+.app-section{padding:48px;flex:1}
+.app-inner{max-width:740px;margin:0 auto}
+
+/* STEPS BAR */
+.steps-bar{display:flex;align-items:center;gap:4px;margin-bottom:40px}
+.step-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);transition:all .4s;flex-shrink:0}
+.step-dot.active{background:var(--white);box-shadow:0 0 6px rgba(255,255,255,.5)}
 .step-dot.done{background:var(--gray2)}
 .step-line{flex:1;height:1px;background:var(--border)}
 
 /* CARD */
-.card{background:var(--bg2);border:1px solid var(--border);padding:40px;margin-bottom:16px;position:relative}
-.card-tag{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:24px}
-.card-title{font-family:var(--font-display);font-size:clamp(28px,4vw,42px);color:var(--white);margin-bottom:12px;line-height:1.1;letter-spacing:0.02em}
+.card{background:var(--bg2);border:1px solid var(--border);padding:36px;position:relative;margin-bottom:12px}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.3}
+.card-tag{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:20px}
+.card-title{font-family:var(--font-display);font-size:clamp(26px,3.5vw,38px);letter-spacing:0.02em;margin-bottom:10px;line-height:1.1}
 .card-title em{color:var(--accent);font-style:normal}
-.card-text{font-size:15px;color:var(--gray);line-height:1.7;margin-bottom:32px;font-weight:300}
+.card-text{font-size:14px;color:var(--gray);line-height:1.7;margin-bottom:28px;font-weight:300}
 
 /* INPUTS */
-textarea,input[type=text]{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--white);font-family:var(--font-body);font-size:15px;padding:16px 20px;outline:none;resize:none;transition:border-color .3s;line-height:1.6}
+textarea,input[type=text]{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--white);font-family:var(--font-body);font-size:15px;padding:15px 18px;outline:none;resize:none;transition:border-color .3s;line-height:1.6}
 textarea:focus,input[type=text]:focus{border-color:var(--gray)}
 textarea::placeholder,input[type=text]::placeholder{color:var(--gray2)}
 
 /* QUESTION */
-.q-num{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.2em;margin-bottom:12px}
-.q-text{font-family:var(--font-display);font-size:clamp(24px,3.5vw,36px);color:var(--white);margin-bottom:8px;line-height:1.1;letter-spacing:0.02em}
-.q-hint{font-size:13px;color:var(--gray2);font-style:italic;margin-bottom:24px;font-weight:300}
+.q-meta{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.q-num{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.15em}
+.q-cat{font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.15em;background:rgba(255,69,0,.08);padding:3px 8px}
+.q-text{font-family:var(--font-display);font-size:clamp(22px,3vw,32px);letter-spacing:0.02em;margin-bottom:6px;line-height:1.1}
+.q-hint{font-size:12px;color:var(--gray2);font-style:italic;margin-bottom:20px;font-weight:300}
 
 /* PROGRESS */
-.progress-bar{height:1px;background:var(--border);margin-bottom:40px}
-.progress-fill{height:100%;background:var(--white);transition:width .6s ease}
+.progress-bar{height:1px;background:var(--border);margin-bottom:36px}
+.progress-fill{height:100%;background:var(--accent);transition:width .5s ease}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;font-family:var(--font-body);font-size:13px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:none;font-weight:600;transition:all .2s}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;font-family:var(--font-body);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border:none;font-weight:700;transition:all .2s}
 .btn-white{background:var(--white);color:var(--bg)}
 .btn-white:hover{background:#e0e0e0}
 .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--gray)}
 .btn-ghost:hover{border-color:var(--gray);color:var(--white)}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 
 /* PROMPT OUTPUT */
-.prompt-wrap{position:relative;margin-bottom:24px}
 .prompt-label{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px}
-.prompt-output{background:var(--bg3);border:1px solid var(--border2);padding:28px;font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--white);white-space:pre-wrap;word-break:break-word}
-.copy-btn{position:absolute;top:36px;right:12px;background:var(--border2);border:none;color:var(--gray);cursor:pointer;padding:6px 14px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;transition:all .2s}
+.prompt-wrap{position:relative;margin-bottom:20px}
+.prompt-output{background:var(--bg3);border:1px solid var(--border2);padding:24px;font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--white);white-space:pre-wrap;word-break:break-word;min-height:120px}
+.copy-btn{position:absolute;top:10px;right:10px;background:var(--border2);border:none;color:var(--gray);cursor:pointer;padding:5px 12px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;transition:all .2s}
 .copy-btn:hover{background:var(--white);color:var(--bg)}
 
+/* RATING */
+.rating-section{border:1px solid var(--border);padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:gap;gap:12px}
+.rating-label{font-family:var(--font-mono);font-size:11px;color:var(--gray);letter-spacing:0.1em}
+.rating-buttons{display:flex;gap:8px}
+.rating-btn{background:var(--bg3);border:1px solid var(--border2);color:var(--gray);font-family:var(--font-mono);font-size:12px;padding:8px 18px;cursor:pointer;letter-spacing:0.08em;transition:all .2s;display:flex;align-items:center;gap:6px}
+.rating-btn:hover{border-color:var(--gray)}
+.rating-btn.good:hover,.rating-btn.good.active{background:rgba(34,197,94,.1);border-color:var(--success);color:var(--success)}
+.rating-btn.bad:hover,.rating-btn.bad.active{background:rgba(239,68,68,.1);border-color:var(--danger);color:var(--danger)}
+.rating-thanks{font-family:var(--font-mono);font-size:11px;color:var(--gray2);letter-spacing:0.08em}
+
 /* LOADING */
-.loading{display:flex;align-items:center;gap:16px;padding:32px 0;justify-content:center}
-.loading-text{font-family:var(--font-mono);font-size:13px;color:var(--gray);letter-spacing:0.1em}
-.loading-dots span{animation:blink 1.2s infinite;opacity:0}
-.loading-dots span:nth-child(2){animation-delay:.2s}
-.loading-dots span:nth-child(3){animation-delay:.4s}
-@keyframes blink{0%,100%{opacity:0}50%{opacity:1}}
-
-/* DIVIDER */
-.divider{border:none;border-top:1px solid var(--border);margin:32px 0}
-
-/* HIDDEN / FADE */
-.hidden{display:none!important}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.fade-in{animation:fadeUp .4s ease both}
+.loading-card{text-align:center;padding:56px 36px}
+.loading-title{font-family:var(--font-display);font-size:36px;letter-spacing:0.04em;margin-bottom:16px}
+.loading-title span{color:var(--accent)}
+.loading-bar{height:1px;background:var(--border);margin:24px auto;max-width:300px;overflow:hidden;position:relative}
+.loading-bar::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:slide 1.5s infinite}
+@keyframes slide{to{left:100%}}
+.loading-text{font-family:var(--font-mono);font-size:11px;color:var(--gray2);letter-spacing:0.1em}
 
 /* SUCCESS */
-.success-crown{font-family:var(--font-display);font-size:48px;color:var(--accent);display:block;margin-bottom:8px;letter-spacing:0.05em}
+.success-title{font-family:var(--font-display);font-size:clamp(32px,4vw,52px);letter-spacing:0.02em;margin-bottom:4px;line-height:1}
+.success-title span{color:var(--accent)}
+
+/* HIDDEN/FADE */
+.hidden{display:none!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .35s ease both}
 
 /* FOOTER */
-footer{border-top:1px solid var(--border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.footer-logo{font-family:var(--font-display);font-size:20px;letter-spacing:0.08em;color:var(--gray2)}
-.footer-text{font-family:var(--font-mono);font-size:11px;color:var(--gray2);letter-spacing:0.1em}
+footer{border-top:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.footer-logo{font-family:var(--font-display);font-size:18px;letter-spacing:0.08em;color:var(--gray2)}
+.footer-logo span{color:var(--accent)}
+.footer-text{font-family:var(--font-mono);font-size:10px;color:var(--gray2);letter-spacing:0.1em}
 
-@media(max-width:640px){
-  header{padding:16px 20px}
-  .header-nav{display:none}
-  .hero{padding:48px 20px 40px}
-  main{padding:40px 20px}
-  .card{padding:28px 20px}
-  footer{padding:20px}
-}
+/* RESPONSIVE */
+@media(max-width:900px){.sidebar{display:none}.app-body{flex-direction:column}}
+@media(max-width:640px){header{padding:0 20px}.hero{padding:48px 24px 40px}.how-section,.app-section{padding:40px 24px}.card{padding:24px 20px}.header-nav{display:none}}
 </style>
 </head>
 <body>
+<div class="app-layout">
 
 <!-- HEADER -->
 <header>
-  <div class="header-logo">PROMPTKING</div>
+  <div class="header-logo">PROMPT<span>KING</span></div>
   <nav class="header-nav">
-    <a href="#app">Generate</a>
-    <a href="#how">How it works</a>
+    <a onclick="scrollToSection('how')">How it works</a>
+    <a onclick="scrollToSection('app')">Generate</a>
   </nav>
-  <button class="header-btn" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">Try Free →</button>
+  <button class="header-btn" onclick="scrollToSection('app')">Try Free →</button>
 </header>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-tag">AI Prompt Engineering</div>
-  <div class="hero-title">PROMPT<br><span>KING</span></div>
-  <p class="hero-sub">Answer a few smart questions. Get the most powerful AI prompt possible. No guessing. No wasted tokens.</p>
-  <div class="hero-actions">
-    <button class="btn-primary" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">Generate Your Prompt →</button>
-    <button class="btn-secondary">See Examples</button>
+<div class="app-body">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">Prompt History</div>
+    <button class="sidebar-clear" onclick="clearHistory()">Clear all</button>
   </div>
-  <div class="hero-counter">👑 &nbsp;TRUSTED BY 3,000+ AI USERS &nbsp;·&nbsp; 10,000+ PROMPTS GENERATED</div>
-</section>
-
-<!-- APP -->
-<div id="app">
-<main>
-  <div class="steps-bar" id="stepsBar"></div>
-
-  <!-- SCREEN 1 -->
-  <div id="screen1" class="fade-in">
-    <div class="card">
-      <div class="card-tag">// Start here</div>
-      <div class="card-title">What do you want<br><em>AI to do for you?</em></div>
-      <p class="card-text">Describe your goal in plain language. I'll ask the right questions and forge a prompt that gets results — every time.</p>
-      <textarea id="goalInput" rows="4" placeholder="e.g. I want to write product descriptions for my Shopify dropshipping store that convert visitors into buyers..."></textarea>
-    </div>
-    <div style="display:flex;gap:12px;margin-top:4px">
-      <button class="btn btn-white" onclick="startSession()">Generate Prompt →</button>
+  <div class="sidebar-list" id="historyList">
+    <div class="history-empty" id="historyEmpty">
+      👑<br><br>Your generated prompts<br>will appear here
     </div>
   </div>
+</aside>
 
-  <!-- SCREEN 2 -->
-  <div id="screen2" class="hidden">
-    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-    <div class="card fade-in" id="questionCard">
-      <div class="q-num">QUESTION <span id="qNum">1</span> / <span id="qTotal">6</span> &nbsp;·&nbsp; <span id="qCategory"></span></div>
-      <div class="q-text" id="qText"></div>
-      <div class="q-hint" id="qHint"></div>
-      <input type="text" id="answerInput" placeholder="Your answer..." onkeydown="if(event.key==='Enter')nextQuestion()">
-    </div>
-    <div style="display:flex;gap:12px;margin-top:4px">
-      <button class="btn btn-white" onclick="nextQuestion()">Next →</button>
-      <button class="btn btn-ghost" onclick="skipQuestion()">Skip</button>
-    </div>
-  </div>
+<!-- MAIN -->
+<div class="main-content">
 
-  <!-- SCREEN 3 -->
-  <div id="screen3" class="hidden">
-    <div class="card fade-in" style="text-align:center;padding:60px 40px">
-      <div class="loading">
-        <div class="loading-text">FORGING YOUR PROMPT<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">AI Prompt Engineering</div>
+    <div class="hero-title">PROMPT<br><span>KING</span></div>
+    <p class="hero-sub">Answer smart questions. Get the most powerful AI prompt possible. No guessing. No wasted tokens.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="scrollToSection('app')">Generate Your Prompt →</button>
+      <button class="btn-secondary" onclick="scrollToSection('how')">How it works</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><strong>3K+</strong><span>Users</span></div>
+      <div class="hero-stat"><strong>10K+</strong><span>Prompts</span></div>
+      <div class="hero-stat"><strong>9</strong><span>Smart Questions</span></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section" id="how">
+    <div class="section-tag">// Process</div>
+    <div class="section-title">HOW IT<br>WORKS</div>
+    <div class="how-grid">
+      <div class="how-step"><div class="how-num">01</div><div class="how-title">Describe your goal</div><div class="how-desc">Tell us what you want AI to do in plain language.</div></div>
+      <div class="how-step"><div class="how-num">02</div><div class="how-title">Answer smart questions</div><div class="how-desc">We ask 3–9 targeted questions based on complexity.</div></div>
+      <div class="how-step"><div class="how-num">03</div><div class="how-title">Get your prompt</div><div class="how-desc">Receive a powerful, ready-to-use prompt instantly.</div></div>
+      <div class="how-step"><div class="how-num">04</div><div class="how-title">Rate & improve</div><div class="how-desc">Your feedback helps PromptKing learn better questions.</div></div>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section class="app-section" id="app">
+    <div class="app-inner">
+      <div class="steps-bar" id="stepsBar"></div>
+
+      <!-- S1: GOAL -->
+      <div id="screen1" class="fade-in">
+        <div class="card">
+          <div class="card-tag">// Start here</div>
+          <div class="card-title">What do you want<br><em>AI to do?</em></div>
+          <p class="card-text">Describe your goal. The more specific, the better. I'll figure out what to ask you next.</p>
+          <textarea id="goalInput" rows="4" placeholder="e.g. Create a monthly content plan for a spring fashion campaign targeting young people aged 18-25..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-white" onclick="startSession()">Generate Prompt →</button>
+        </div>
       </div>
-      <p style="color:var(--gray2);font-size:13px;font-family:var(--font-mono);letter-spacing:0.05em">Analyzing answers · Crafting the perfect prompt · Almost ready</p>
-    </div>
-  </div>
 
-  <!-- SCREEN 4 -->
-  <div id="screen4" class="hidden fade-in">
-    <div class="card">
-      <div class="card-tag">// Your royal prompt is ready</div>
-      <div class="success-crown">PROMPT<br>READY.</div>
-      <hr class="divider">
-      <div class="prompt-wrap">
-        <div class="prompt-label">Generated Prompt — Copy & paste into any AI</div>
-        <div class="prompt-output" id="promptOutput"></div>
-        <button class="copy-btn" onclick="copyPrompt()">COPY</button>
+      <!-- S2: QUESTIONS -->
+      <div id="screen2" class="hidden">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <div class="card fade-in" id="questionCard">
+          <div class="q-meta">
+            <div class="q-num">Q <span id="qNum">1</span>/<span id="qTotal">7</span></div>
+            <div class="q-cat" id="qCat"></div>
+          </div>
+          <div class="q-text" id="qText"></div>
+          <div class="q-hint" id="qHint"></div>
+          <input type="text" id="answerInput" placeholder="Your answer..." onkeydown="if(event.key==='Enter')nextQ()">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-white" onclick="nextQ()">Next →</button>
+          <button class="btn btn-ghost" onclick="skipQ()">Skip</button>
+        </div>
       </div>
-      <hr class="divider">
-      <p style="color:var(--gray2);font-size:13px;font-family:var(--font-mono);margin-bottom:24px;letter-spacing:0.05em">Paste this into ChatGPT, Claude, Gemini, or any AI tool.</p>
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <button class="btn btn-white" onclick="restart()">New Prompt →</button>
-        <button class="btn btn-ghost" onclick="refinePrompt()">Refine It</button>
-      </div>
-    </div>
-  </div>
-</main>
-</div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">PROMPTKING</div>
-  <div class="footer-text">© 2025 PROMPTKING &nbsp;·&nbsp; MASTER OF AI PROMPTS</div>
-</footer>
+      <!-- S3: LOADING -->
+      <div id="screen3" class="hidden">
+        <div class="card loading-card fade-in">
+          <div class="loading-title">FORGING YOUR<br><span>PROMPT</span></div>
+          <div class="loading-bar"></div>
+          <div class="loading-text">Analyzing · Engineering · Optimizing</div>
+        </div>
+      </div>
+
+      <!-- S4: RESULT -->
+      <div id="screen4" class="hidden fade-in">
+        <div class="card">
+          <div class="card-tag">// Your prompt is ready</div>
+          <div class="success-title">PROMPT<br><span>READY.</span></div>
+          <div style="height:24px"></div>
+          <div class="prompt-label">Generated Prompt</div>
+          <div class="prompt-wrap">
+            <div class="prompt-output" id="promptOutput"></div>
+            <button class="copy-btn" onclick="copyPrompt()">COPY</button>
+          </div>
+          <div class="rating-section">
+            <div class="rating-label">Was this prompt useful?</div>
+            <div class="rating-buttons">
+              <button class="rating-btn good" id="ratingGood" onclick="ratePrompt('good')">👍 Yes</button>
+              <button class="rating-btn bad" id="ratingBad" onclick="ratePrompt('bad')">👎 No</button>
+            </div>
+            <div class="rating-thanks hidden" id="ratingThanks">Thanks for the feedback!</div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-white" onclick="restart()">New Prompt →</button>
+            <button class="btn btn-ghost" onclick="refine()">Refine It</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">PROMPT<span>KING</span></div>
+    <div class="footer-text">© 2025 PROMPTKING · MASTER OF AI PROMPTS</div>
+  </footer>
+
+</div><!-- end main-content -->
+</div><!-- end app-body -->
+</div><!-- end app-layout -->
 
 <script>
-const QS={marketing:[{cat:"AUDIENCE",text:"Who is your ideal customer?",hint:"e.g. women aged 25-40 who love fitness"},{cat:"BENEFITS",text:"What are the 3 biggest benefits of your product?",hint:"Think about what problems it solves"},{cat:"TONE",text:"What tone should the AI use?",hint:"e.g. professional, friendly, luxury, urgent"},{cat:"PLATFORM",text:"Where will this content appear?",hint:"e.g. Shopify product page, Facebook ad, email"},{cat:"CTA",text:"What action should the reader take?",hint:"e.g. buy now, sign up, click the link"},{cat:"USP",text:"What makes you different from competitors?",hint:"Your unique selling point"}],writing:[{cat:"FORMAT",text:"What format do you need?",hint:"e.g. blog post, email, bullet points, script"},{cat:"LENGTH",text:"How long should the output be?",hint:"e.g. 200 words, 5 paragraphs, short and punchy"},{cat:"TONE",text:"What tone and style?",hint:"e.g. formal, conversational, humorous"},{cat:"AUDIENCE",text:"Who will be reading this?",hint:"e.g. beginners, experts, business owners"},{cat:"INSPIRATION",text:"Any style or brand to inspire from?",hint:"e.g. write like Apple marketing"},{cat:"CONSTRAINTS",text:"Anything to include or avoid?",hint:"e.g. always mention brand, no jargon"}],business:[{cat:"SITUATION",text:"What is the business challenge?",hint:"Describe the problem in detail"},{cat:"GOAL",text:"What outcome do you want?",hint:"Be specific about the desired result"},{cat:"LIMITS",text:"What are your constraints?",hint:"e.g. small team, limited budget"},{cat:"STAKEHOLDERS",text:"Who are the key people involved?",hint:"e.g. investors, customers, team"},{cat:"FORMAT",text:"How should the response be structured?",hint:"e.g. action plan, SWOT, step-by-step"},{cat:"LEVEL",text:"What expertise level should AI assume?",hint:"e.g. beginner, experienced marketer"}],general:[{cat:"CONTEXT",text:"Give more background on what you're working on.",hint:"The more detail, the better"},{cat:"FORMAT",text:"How should the AI respond?",hint:"e.g. bullet points, paragraphs, table"},{cat:"TONE",text:"What tone should it use?",hint:"e.g. casual, formal, expert"},{cat:"LENGTH",text:"How detailed do you want the answer?",hint:"e.g. brief overview, in-depth"},{cat:"EXAMPLES",text:"Should AI include examples or case studies?",hint:"e.g. yes with real examples"},{cat:"CONSTRAINTS",text:"Any requirements or things to avoid?",hint:"e.g. no jargon, practical only"}]};
-let goal='',questions=[],answers=[],qIdx=0,total=0;
-function detect(g){g=g.toLowerCase();if(/product|shop|sell|ad|market|customer|descri/.test(g))return'marketing';if(/write|blog|email|article|post|content|story/.test(g))return'writing';if(/business|strategy|plan|startup|company|team/.test(g))return'business';return'general'}
-function buildBar(n){const b=document.getElementById('stepsBar');b.innerHTML='';for(let i=0;i<n;i++){if(i>0)b.innerHTML+='<div class="step-line"></div>';b.innerHTML+=`<div class="step-dot" id="d${i}"></div>`}}
-function updateBar(c){for(let i=0;i<total;i++){const d=document.getElementById(`d${i}`);if(!d)return;d.className='step-dot';if(i<c)d.classList.add('done');else if(i===c)d.classList.add('active')}}
-function show(id){['screen1','screen2','screen3','screen4'].forEach(s=>{const el=document.getElementById(s);el.classList.add('hidden')});const el=document.getElementById(id);el.classList.remove('hidden');el.classList.remove('fade-in');void el.offsetWidth;el.classList.add('fade-in')}
-function startSession(){const g=document.getElementById('goalInput').value.trim();if(!g){document.getElementById('goalInput').style.borderColor='#ff4444';return}goal=g;answers=[];qIdx=0;questions=QS[detect(g)];total=questions.length;buildBar(total);document.getElementById('qTotal').textContent=total;show('screen2');renderQ()}
-function renderQ(){const q=questions[qIdx];document.getElementById('qNum').textContent=qIdx+1;document.getElementById('qCategory').textContent=q.cat;document.getElementById('qText').textContent=q.text;document.getElementById('qHint').textContent=q.hint?'→ '+q.hint:'';document.getElementById('answerInput').value='';document.getElementById('answerInput').focus();document.getElementById('progressFill').style.width=(qIdx/total*100)+'%';updateBar(qIdx);const c=document.getElementById('questionCard');c.classList.remove('fade-in');void c.offsetWidth;c.classList.add('fade-in')}
-function nextQuestion(){const a=document.getElementById('answerInput').value.trim();answers.push({q:questions[qIdx].text,a:a||'(not specified)'});qIdx++;if(qIdx>=total)generatePrompt();else renderQ()}
-function skipQuestion(){answers.push({q:questions[qIdx].text,a:'(skipped)'});qIdx++;if(qIdx>=total)generatePrompt();else renderQ()}
-async function generatePrompt(){show('screen3');document.getElementById('progressFill').style.width='100%';const at=answers.filter(a=>a.a!=='(skipped)').map(a=>`- ${a.q}: ${a.a}`).join('\n');try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`You are PromptKing, a master prompt engineer. Create the most powerful, detailed AI prompt based on the user's goal and answers. Include role, context, task, format, tone, and constraints. Return ONLY the prompt itself, no explanations, 150-350 words.`,messages:[{role:'user',content:`Goal: ${goal}\n\nAnswers:\n${at}\n\nGenerate the perfect prompt.`}]})});const d=await r.json();document.getElementById('promptOutput').textContent=d.content?.[0]?.text||fallback();show('screen4')}catch(e){document.getElementById('promptOutput').textContent=fallback();show('screen4')}}
-function fallback(){return`You are an expert assistant. Your task is to help with the following goal: ${goal}\n\nContext and requirements:\n${answers.map(a=>`• ${a.q} → ${a.a}`).join('\n')}\n\nProvide a comprehensive, well-structured, and actionable response. Be specific and practical. Tailor everything to the details provided above. Avoid generic advice.`}
-function copyPrompt(){navigator.clipboard.writeText(document.getElementById('promptOutput').textContent).then(()=>{const b=document.querySelector('.copy-btn');b.textContent='COPIED ✓';b.style.background='var(--white)';b.style.color='var(--bg)';setTimeout(()=>{b.textContent='COPY';b.style.background='';b.style.color=''},2000)})}
-function refinePrompt(){qIdx=0;answers=[];show('screen2');renderQ()}
-function restart(){document.getElementById('goalInput').value='';goal='';answers=[];qIdx=0;document.getElementById('stepsBar').innerHTML='';show('screen1')}
+// QUESTIONS — 9 targeted questions based on proven prompt methodology
+const ALL_QUESTIONS = [
+  {cat:"TASK",        text:"What exactly should AI do?",                    hint:"→ Start with a verb: write, create, analyze, design, calculate...",  required:true},
+  {cat:"CONTEXT",     text:"What is the background? Why do you need this?", hint:"→ The more context, the better AI understands your intent",           required:true},
+  {cat:"ROLE",        text:"What role should AI play?",                     hint:"→ e.g. 'You are a senior marketer' / 'You are an expert copywriter'", required:true},
+  {cat:"EXAMPLE",     text:"Can you share an example you like?",            hint:"→ A style, format, brand, or output that inspires you",               required:false},
+  {cat:"TONE",        text:"What tone and style should the response have?", hint:"→ e.g. professional, casual, Gen Z, academic, friendly, bold",        required:true},
+  {cat:"LENGTH",      text:"How long should the output be?",                hint:"→ e.g. 400 characters, 3 paragraphs, bullet points only",             required:false},
+  {cat:"FORMAT",      text:"What format do you need?",                      hint:"→ e.g. table, bullet list, plain text, numbered steps, code",         required:true},
+  {cat:"VARIANTS",    text:"How many variants should AI generate?",         hint:"→ e.g. 1 final version / 3 options to choose from / 10 ideas",       required:false},
+  {cat:"CUSTOM",      text:"Any custom instructions or things to avoid?",   hint:"→ e.g. no apologies, be concise, avoid jargon, always include CTA",  required:false},
+];
+
+// Complexity detection — determines how many questions to ask
+function detectComplexity(goal) {
+  const g = goal.toLowerCase();
+  const wordCount = goal.trim().split(/\s+/).length;
+  const complexKeywords = ['campaign','strategy','plan','business','launch','brand','content','marketing','complete','full','detailed','comprehensive'];
+  const isComplex = complexKeywords.some(k => g.includes(k)) || wordCount > 15;
+  if (isComplex) return 'complex';      // 9 questions
+  if (wordCount > 8) return 'medium';   // 6 questions
+  return 'simple';                      // 4 questions
+}
+
+function getQuestions(complexity) {
+  if (complexity === 'simple')  return ALL_QUESTIONS.filter(q => q.required);        // 4
+  if (complexity === 'medium')  return ALL_QUESTIONS.slice(0, 6);                    // 6
+  return ALL_QUESTIONS;                                                               // 9
+}
+
+// STATE
+let goal = '', questions = [], answers = [], qIdx = 0, total = 0;
+let currentPrompt = '', currentRating = null;
+let history = JSON.parse(localStorage.getItem('pk_history') || '[]');
+
+// INIT
+renderHistory();
+
+// NAV
+function scrollToSection(id) {
+  document.getElementById(id === 'how' ? 'how' : 'app').scrollIntoView({behavior:'smooth'});
+}
+
+// SHOW SCREEN
+function show(id) {
+  ['screen1','screen2','screen3','screen4'].forEach(s => {
+    const el = document.getElementById(s);
+    el.classList.add('hidden');
+  });
+  const el = document.getElementById(id);
+  el.classList.remove('hidden');
+  el.classList.remove('fade-in');
+  void el.offsetWidth;
+  el.classList.add('fade-in');
+}
+
+// STEPS BAR
+function buildBar(n) {
+  const b = document.getElementById('stepsBar');
+  b.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    if (i > 0) b.innerHTML += '<div class="step-line"></div>';
+    b.innerHTML += `<div class="step-dot" id="d${i}"></div>`;
+  }
+}
+function updateBar(c) {
+  for (let i = 0; i < total; i++) {
+    const d = document.getElementById(`d${i}`);
+    if (!d) continue;
+    d.className = 'step-dot';
+    if (i < c) d.classList.add('done');
+    else if (i === c) d.classList.add('active');
+  }
+}
+
+// START
+function startSession() {
+  const g = document.getElementById('goalInput').value.trim();
+  if (!g) { document.getElementById('goalInput').style.borderColor = '#ff4444'; return; }
+  goal = g;
+  answers = [];
+  qIdx = 0;
+  currentRating = null;
+  const complexity = detectComplexity(g);
+  questions = getQuestions(complexity);
+  total = questions.length;
+  buildBar(total);
+  document.getElementById('qTotal').textContent = total;
+  show('screen2');
+  renderQ();
+}
+
+// RENDER QUESTION
+function renderQ() {
+  const q = questions[qIdx];
+  document.getElementById('qNum').textContent = qIdx + 1;
+  document.getElementById('qCat').textContent = q.cat;
+  document.getElementById('qText').textContent = q.text;
+  document.getElementById('qHint').textContent = q.hint;
+  document.getElementById('answerInput').value = '';
+  document.getElementById('answerInput').focus();
+  document.getElementById('progressFill').style.width = (qIdx / total * 100) + '%';
+  updateBar(qIdx);
+  const card = document.getElementById('questionCard');
+  card.classList.remove('fade-in');
+  void card.offsetWidth;
+  card.classList.add('fade-in');
+}
+
+function nextQ() {
+  const a = document.getElementById('answerInput').value.trim();
+  answers.push({ cat: questions[qIdx].cat, q: questions[qIdx].text, a: a || '(not specified)' });
+  qIdx++;
+  if (qIdx >= total) generatePrompt();
+  else renderQ();
+}
+
+function skipQ() {
+  answers.push({ cat: questions[qIdx].cat, q: questions[qIdx].text, a: '(skipped)' });
+  qIdx++;
+  if (qIdx >= total) generatePrompt();
+  else renderQ();
+}
+
+// GENERATE
+async function generatePrompt() {
+  show('screen3');
+  document.getElementById('progressFill').style.width = '100%';
+
+  const answersText = answers
+    .filter(a => a.a !== '(skipped)')
+    .map(a => `[${a.cat}] ${a.q}\n→ ${a.a}`)
+    .join('\n\n');
+
+  const system = `You are PromptKing — the world's most advanced AI prompt engineer. Your ONLY job is to craft perfect, ready-to-use prompts for other AI tools (ChatGPT, Claude, Gemini, etc.).
+
+Rules:
+- Return ONLY the prompt itself — no explanations, no preamble, no "Here is your prompt"
+- The prompt must be specific, detailed, and immediately usable
+- Always include: role for AI, clear task, context, tone, format, and constraints
+- Length: 150-400 words
+- Write in English
+- Make it powerful enough that any AI will produce exceptional results`;
+
+  const userMsg = `User's goal: ${goal}
+
+Answers to clarifying questions:
+${answersText}
+
+Generate the perfect prompt.`;
+
+  try {
+    const r = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ goal, answers })
+    });
+    const d = await r.json();
+    currentPrompt = d.prompt || fallback();
+  } catch(e) {
+    console.error('API error:', e);
+    currentPrompt = fallback();
+  }
+
+  document.getElementById('promptOutput').textContent = currentPrompt;
+  document.getElementById('ratingGood').classList.remove('active');
+  document.getElementById('ratingBad').classList.remove('active');
+  document.getElementById('ratingThanks').classList.add('hidden');
+  show('screen4');
+}
+
+function fallback() {
+  const parts = answers.filter(a => a.a !== '(skipped)' && a.a !== '(not specified)');
+  return `You are ${parts.find(p=>p.cat==='ROLE')?.a || 'an expert assistant'}.\n\nYour task: ${goal}\n\nContext and requirements:\n${parts.map(p=>`• ${p.cat}: ${p.a}`).join('\n')}\n\nProvide a comprehensive, specific, and actionable response. Follow the format and tone specified. Avoid generic advice — tailor everything to the exact details provided above.`;
+}
+
+// COPY
+function copyPrompt() {
+  navigator.clipboard.writeText(currentPrompt).then(() => {
+    const b = document.querySelector('.copy-btn');
+    b.textContent = 'COPIED ✓';
+    b.style.background = 'var(--white)';
+    b.style.color = 'var(--bg)';
+    setTimeout(() => { b.textContent = 'COPY'; b.style.background = ''; b.style.color = ''; }, 2000);
+  });
+}
+
+// RATING
+function ratePrompt(type) {
+  currentRating = type;
+  document.getElementById('ratingGood').classList.remove('active');
+  document.getElementById('ratingBad').classList.remove('active');
+  document.getElementById(`rating${type.charAt(0).toUpperCase()+type.slice(1)}`).classList.add('active');
+  document.getElementById('ratingThanks').classList.remove('hidden');
+  saveToHistory(type);
+}
+
+// HISTORY
+function saveToHistory(rating = null) {
+  const item = {
+    id: Date.now(),
+    goal: goal.substring(0, 80),
+    prompt: currentPrompt,
+    rating,
+    time: new Date().toLocaleTimeString('en', {hour:'2-digit', minute:'2-digit'})
+  };
+  history.unshift(item);
+  if (history.length > 50) history = history.slice(0, 50);
+  localStorage.setItem('pk_history', JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const empty = document.getElementById('historyEmpty');
+  if (history.length === 0) {
+    empty.style.display = 'block';
+    const items = list.querySelectorAll('.history-item');
+    items.forEach(i => i.remove());
+    return;
+  }
+  empty.style.display = 'none';
+  list.querySelectorAll('.history-item').forEach(i => i.remove());
+  history.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'history-item';
+    el.innerHTML = `
+      <div class="history-goal">${item.goal}${item.goal.length >= 80 ? '...' : ''}</div>
+      <div class="history-meta">
+        <div class="history-time">${item.time}</div>
+        <div class="history-rating">
+          <div class="rating-dot ${item.rating === 'good' ? 'good' : item.rating === 'bad' ? 'bad' : 'none'}"></div>
+        </div>
+      </div>
+      <button class="history-delete" onclick="deleteHistory(${item.id}, event)">×</button>
+    `;
+    el.addEventListener('click', () => loadFromHistory(item));
+    list.appendChild(el);
+  });
+}
+
+function loadFromHistory(item) {
+  currentPrompt = item.prompt;
+  goal = item.goal;
+  document.getElementById('promptOutput').textContent = item.prompt;
+  document.getElementById('ratingGood').classList.remove('active');
+  document.getElementById('ratingBad').classList.remove('active');
+  document.getElementById('ratingThanks').classList.add('hidden');
+  if (item.rating) {
+    document.getElementById(`rating${item.rating.charAt(0).toUpperCase()+item.rating.slice(1)}`).classList.add('active');
+    document.getElementById('ratingThanks').classList.remove('hidden');
+  }
+  show('screen4');
+  document.getElementById('app').scrollIntoView({behavior:'smooth'});
+}
+
+function deleteHistory(id, e) {
+  e.stopPropagation();
+  history = history.filter(i => i.id !== id);
+  localStorage.setItem('pk_history', JSON.stringify(history));
+  renderHistory();
+}
+
+function clearHistory() {
+  history = [];
+  localStorage.setItem('pk_history', JSON.stringify(history));
+  renderHistory();
+}
+
+// RESTART / REFINE
+function restart() {
+  document.getElementById('goalInput').value = '';
+  goal = ''; answers = []; qIdx = 0;
+  document.getElementById('stepsBar').innerHTML = '';
+  show('screen1');
+  document.getElementById('app').scrollIntoView({behavior:'smooth'});
+}
+
+function refine() {
+  qIdx = 0; answers = [];
+  questions = getQuestions(detectComplexity(goal));
+  total = questions.length;
+  buildBar(total);
+  document.getElementById('qTotal').textContent = total;
+  show('screen2');
+  renderQ();
+}
+
+// Auto-save to history when prompt is shown (without rating yet)
+const origGenerate = generatePrompt;
 </script>
 </body>
 </html>

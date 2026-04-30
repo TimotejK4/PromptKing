@@ -113,7 +113,7 @@ header{height:60px;border-bottom:1px solid var(--border2);padding:0 32px;display
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 .lion-wrap{position:relative;display:flex;justify-content:center;align-items:center;width:100%;max-width:500px;aspect-ratio:1}
-#lion-canvas{width:100%;height:auto;max-width:500px;display:block;filter:drop-shadow(0 0 20px rgba(255,255,255,0.3))}
+#lion-canvas{width:100%;height:auto;max-width:500px;display:block;background:transparent}
 @keyframes glow-pulse{0%,100%{opacity:0.4}50%{opacity:0.8}}
 
 .section-tag{font-family:var(--font-mono);font-size:11px;color:var(--silver-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px}
@@ -491,9 +491,8 @@ footer{border-top:1px solid var(--border2);padding:20px 32px;display:flex;align-
   }
   
   function draw(){
-    // Clear with slight fade for trail effect
-    ctx.fillStyle='rgba(0,0,0,0.15)';
-    ctx.fillRect(0,0,W,H);
+    // Clear canvas completely — transparent background
+    ctx.clearRect(0,0,W,H);
     
     if(!lionLoaded)return;
     

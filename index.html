@@ -443,9 +443,8 @@ footer{border-top:1px solid var(--border2);padding:20px 32px;display:flex;align-
   let lionLoaded=false;
   
   lionImg.onload=function(){
-    // Draw the lion to the mask canvas
-    maskCtx.fillStyle='#000';
-    maskCtx.fillRect(0,0,W,H);
+    // Draw the lion preserving transparency
+    maskCtx.clearRect(0,0,W,H);
     maskCtx.drawImage(lionImg,0,0,W,H);
     maskData=maskCtx.getImageData(0,0,W,H);
     lionLoaded=true;
@@ -479,9 +478,16 @@ footer{border-top:1px solid var(--border2);padding:20px 32px;display:flex;align-
     const py=Math.floor(y);
     if(px<0||px>=W||py<0||py>=H)return false;
     const idx=(py*W+px)*4;
-    // Lion is dark (low brightness) on the original, so we want dark pixels
-    const brightness=(maskData.data[idx]+maskData.data[idx+1]+maskData.data[idx+2])/3;
-    return brightness<100; // Inside the lion = dark area
+    // Use alpha channel — lion has visible pixels, transparent background
+    // Also check if pixel is not pure white background
+    const alpha=maskData.data[idx+3];
+    const r=maskData.data[idx];
+    const g=maskData.data[idx+1];
+    const b=maskData.data[idx+2];
+    // Inside = visible (alpha > 128) AND not white background
+    const isVisible=alpha>128;
+    const isNotWhite=(r+g+b)<600; // avoid pure white
+    return isVisible && isNotWhite;
   }
   
   function draw(){
